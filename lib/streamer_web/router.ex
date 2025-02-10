@@ -9,7 +9,9 @@ defmodule StreamerWeb.Router do
         "http://localhost:4321",
         "https://skyeto.com",
         "https://blogtesting.skyeto.net",
-        "https://hlsjs-dev.video-dev.org"
+        "https://hlsjs-dev.video-dev.org",
+        "https://bitmovin.com",
+        "*"
       ]
     )
   end
@@ -19,5 +21,8 @@ defmodule StreamerWeb.Router do
 
     options("/license", StreamerWeb.LicenseController, :options)
     get("/license", StreamerWeb.LicenseController, :license)
+
+    get("/pow", StreamerWeb.CaptchaController, :get_challenge)
+    post("/pow", StreamerWeb.CaptchaController, :get_ticket)
   end
 end

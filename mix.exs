@@ -29,6 +29,7 @@ defmodule Streamer.MixProject do
       {:phoenix, "~> 1.7"},
       {:cors_plug, "~> 3.0"},
       {:phoenix_pubsub, "~> 2.1"},
+      {:html_sanitize_ex, "~> 1.4"},
 
       # AV
       {:membrane_core, "~> 1.1"},
@@ -41,6 +42,9 @@ defmodule Streamer.MixProject do
       {:membrane_http_adaptive_stream_plugin, "~> 0.18.6"},
       {:membrane_aac_plugin, "~> 0.19.0"},
       {:membrane_aac_fdk_plugin, "~> 0.18.11"},
+      {:membrane_audio_mix_plugin, "~> 0.16.2"},
+      {:membrane_ffmpeg_swresample_plugin, "~> 0.20.2"},
+      {:membrane_mp4_plugin, "~> 0.35.2"},
 
       # DB
       {:ecto, "~> 3.12"},
@@ -49,6 +53,7 @@ defmodule Streamer.MixProject do
       {:postgrex, "~> 0.19.3"},
       {:ex_aws, "~> 2.5"},
       {:ex_aws_s3, "~> 2.5"},
+      {:cachex, "~> 4.0"},
 
       # Extra
       {:sweet_xml, "~> 0.6"},

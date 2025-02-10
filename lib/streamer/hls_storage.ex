@@ -22,6 +22,8 @@ defmodule Streamer.HLSStorage do
          %{name: name, type: type, contents: content} = op},
         state
       ) do
+    IO.inspect(type)
+
     case type do
       :manifest ->
         case is_nil(state.encryption) do

@@ -2,6 +2,7 @@ defmodule StreamerWeb.Socket.Socket do
   use Phoenix.Socket
 
   channel("radio:*", StreamerWeb.RadioChannel)
+  channel("chat:*", StreamerWeb.ChatChannel)
 
   @impl true
   def connect(_params, socket, _connect_info) do
