@@ -1,29 +1,40 @@
 defmodule Streamer.Pow do
-  def generate() do
+  # TODO: Refactor out secret loading
+
+  def generate(n \\ 10, difficulty \\ 130) do
     puzzle =
       timestamp() <>
         account_id() <>
         app_id() <>
         puzzle_version() <>
         puzzle_expiry() <>
-        number_of_puzzles() <>
-        puzzle_difficulty() <>
+        number_of_puzzles(n) <>
+        puzzle_difficulty(difficulty) <>
         <<0::size(64)>> <>
         random()
 
-    # TODO: Add config option to set puzzle secret
+    {:ok, priv} = System.get_env("STREAMER_POW_SECRET_KEY") |> Base.decode64()
+
     signature =
-      :crypto.mac(:hmac, :sha256, "secret", puzzle) |> Base.encode16() |> String.slice(0..31)
+      :crypto.sign(:eddsa, :sha256, {:digest, :crypto.hash(:sha256, puzzle)}, [priv, :ed25519])
+      |> Base.encode64()
 
     Cachex.put(:pow_cache, signature, false)
 
     {:ok, signature <> "." <> Base.encode64(puzzle)}
+    # {:ok,
+    # :zlib.compress(
+    #   :crypto.sign(:eddsa, :sha256, {:digest, :crypto.hash(:sha256, puzzle)}, [priv, :ed25519]) <>
+    #     "." <> puzzle
+    # )}
   end
 
   @doc """
   Verifies a base64 encoded solution to puzzle, returns :ok or {:error, reason}
   """
   @spec verify_solution(String.t()) :: :ok | {:error, String.t()}
+  def verify_solution([]), do: {:error, :empty_solution}
+
   def verify_solution(solution) do
     s = String.split(solution, ".")
 
@@ -39,12 +50,23 @@ defmodule Streamer.Pow do
 
   defp verify_signature([signature, puzzle, solutions, _diagnostic]) do
     # TODO: Add config option to set puzzle secret
-    puzzle_test =
-      :crypto.mac(:hmac, :sha256, "secret", Base.decode64!(puzzle))
-      |> Base.encode16()
-      |> String.slice(0..31)
+    # puzzle_test =
+    #  :crypto.mac(:hmac, :sha256, "secret", Base.decode64!(puzzle))
+    #  |> Base.encode16()
+    #  |> String.slice(0..31)
 
-    case puzzle_test == signature do
+    {:ok, pub} = System.get_env("STREAMER_POW_PUBLIC_KEY") |> Base.decode64()
+
+    puzzle_test =
+      :crypto.verify(
+        :eddsa,
+        :sha256,
+        {:digest, :crypto.hash(:sha256, Base.decode64!(puzzle))},
+        Base.decode64!(signature),
+        [pub, :ed25519]
+      )
+
+    case puzzle_test do
       true ->
         puzzle_map = puzzle_to_map(Base.decode64!(puzzle))
         check_expiry(signature, puzzle, puzzle_map, solutions)
@@ -155,9 +177,11 @@ defmodule Streamer.Pow do
   defp pad(b, n), do: pad(b <> <<0>>, n)
 
   defp check_puzzle_solution(puzzle_binary, puzzle, solution) do
+    IO.inspect(solution)
     test = pad(Base.decode64!(puzzle_binary), 120) <> solution
-    # <<t::size(32)-unsigned-little, _::binary-size(28)>> = Blake2.Blake2b.hash(test, <<>>, 32)
-    <<t::size(32)-unsigned-little>> = :crypto.hash(:blake2b, test)
+    <<t::size(32)-unsigned-little, _::binary-size(28)>> = Blake2.Blake2b.hash(test, <<>>, 32)
+    IO.inspect(t)
+    # <<t::size(32)-unsigned-little>> = :crypto.hash(:blake2b, test)
     threshold = floor(:math.pow(2, (255.999 - puzzle[:puzzle_difficulty]) / 8))
 
     if t >= threshold do
@@ -187,13 +211,13 @@ defmodule Streamer.Pow do
     <<1::size(8)>>
   end
 
-  defp number_of_puzzles() do
-    <<20::size(8)>>
+  defp number_of_puzzles(n) do
+    <<n::size(8)>>
   end
 
-  defp puzzle_difficulty() do
+  defp puzzle_difficulty(difficulty) do
     # <<137::size(8)>>
-    <<120::size(8)>>
+    <<difficulty::size(8)>>
   end
 
   defp random() do

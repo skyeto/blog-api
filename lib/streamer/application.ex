@@ -8,7 +8,8 @@ defmodule Streamer.Application do
       StreamerWeb.Endpoint,
       {Streamer.Pipeline, name: Streamer.Pipeline},
       {Phoenix.PubSub, name: Streamer.PubSub},
-      {Cachex, [:pow_cache, [expiration: Cachex.Spec.expiration(interval: :timer.minutes(3))]]}
+      {Cachex, [:pow_cache, [expiration: Cachex.Spec.expiration(interval: :timer.minutes(3))]]},
+      {Streamer.RateLimit, [clean_period: :timer.minutes(1)]}
     ]
 
     opts = [strategy: :one_for_one, name: Streamer.Supervisor]

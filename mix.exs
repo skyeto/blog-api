@@ -27,9 +27,15 @@ defmodule Streamer.MixProject do
       {:plug, "~> 1.16"},
       {:hackney, "~> 1.9"},
       {:phoenix, "~> 1.7"},
-      {:cors_plug, "~> 3.0"},
+      {:corsica, "~> 2.1"},
       {:phoenix_pubsub, "~> 2.1"},
       {:html_sanitize_ex, "~> 1.4"},
+      {:tesla, "~> 1.14"},
+      {:mint, "~> 1.7"},
+      {:jason, "~> 1.4"},
+      {:guardian, "~> 2.3"},
+      {:guardian_phoenix, "~> 2.0"},
+      {:jose, "~> 1.11"},
 
       # AV
       {:membrane_core, "~> 1.1"},
@@ -57,7 +63,9 @@ defmodule Streamer.MixProject do
 
       # Extra
       {:sweet_xml, "~> 0.6"},
-      {:murmur, "~> 2.0"}
+      {:blake2_elixir, "~> 0.8.1"},
+      {:murmur, "~> 2.0"},
+      {:hammer, "~> 7.0"}
     ]
   end
 end

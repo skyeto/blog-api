@@ -6,6 +6,14 @@ defmodule StreamerWeb.Endpoint do
     longpoll: false
   )
 
+  plug(Corsica,
+    origins: [
+      "http://localhost:4321"
+    ],
+    allow_methods: :all,
+    allow_headers: :all
+  )
+
   if code_reloading? do
     plug(Phoenix.CodeReloader)
     plug(Phoenix.Ecto.CheckRepoStatus, otp_app: :streamer)
@@ -23,5 +31,6 @@ defmodule StreamerWeb.Endpoint do
   plug(Plug.MethodOverride)
   plug(Plug.Head)
   plug(Plug.Session, store: :cookie, key: "_skyeto_streamer_key", signing_salt: "ne8@dZ9")
+
   plug(StreamerWeb.Router)
 end

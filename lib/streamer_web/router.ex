@@ -3,26 +3,27 @@ defmodule StreamerWeb.Router do
 
   pipeline :api do
     plug(:accepts, ["json"])
+  end
 
-    plug(CORSPlug,
-      origin: [
-        "http://localhost:4321",
-        "https://skyeto.com",
-        "https://blogtesting.skyeto.net",
-        "https://hlsjs-dev.video-dev.org",
-        "https://bitmovin.com",
-        "*"
-      ]
-    )
+  pipeline :token_auth do
+    plug(Guardian.Plug.VerifyHeader)
+    plug(Guardian.Plug.EnsureAuthenticated)
   end
 
   scope "/api" do
     pipe_through(:api)
 
-    options("/license", StreamerWeb.LicenseController, :options)
     get("/license", StreamerWeb.LicenseController, :license)
 
     get("/pow", StreamerWeb.CaptchaController, :get_challenge)
     post("/pow", StreamerWeb.CaptchaController, :get_ticket)
+
+    get("/token-challenge", StreamerWeb.PrivacyPassController, :token_challenge)
+    post("/token-request", StreamerWeb.PrivacyPassController, :token_request)
+    post("/token-exchange", StreamerWeb.PrivacyPassController, :token_exchange)
+  end
+
+  scope "/" do
+    pipe_through(:token_auth)
   end
 end

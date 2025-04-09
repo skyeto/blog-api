@@ -9,8 +9,8 @@ config :streamer, Streamer.Repo,
   hostname: "localhost"
 
 config :ex_aws,
-  access_key_id: "bZ9cytNfaIwlF1vANaNK",
-  secret_access_key: "RgzQ28cHbxJsnDH8RifB8zSUvXxxItgLM0Apdi8B"
+  access_key_id: System.get_env("STREAMER_S3_ACCESS_KEY"),
+  secret_access_key: System.get_env("STREAMER_S3_SECRET_ACCESS_KEY")
 
 config :ex_aws, :s3,
   scheme: "https://",
@@ -19,13 +19,18 @@ config :ex_aws, :s3,
 config :streamer, StreamerWeb.Endpoint,
   adapter: Bandit.PhoenixAdapter,
   url: [host: "api.blog.skyeto.net", port: 443],
-  secret_key_base: "bBLH8/x1osO617ev7XKMpqSss3MsdZvopqJPlU8CmYmZa1J0YVTNFaJUcPtGdKeb",
+  secret_key_base: System.get_env("STREAMER_SECRET_KEY_BASE"),
   http: [port: 4000],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
   pubsub_server: Streamer.PubSub
 
+config :streamer, Streamer.Guardian.Session,
+  issues: "streamer",
+  secret_key: System.get_env("STREAMER_GUARDIAN_SESSION_SECRET")
+
 config :phoenix, :stacktrace_depth, 30
 config :logger, :console, format: "[$level] $message\n"
 config :phoenix, :plug_init_mode, :runtime
+config :tesla, adapter: {Tesla.Adapter.Hackney, recv_timeout: 30_000}

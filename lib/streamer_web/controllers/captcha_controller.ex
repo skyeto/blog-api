@@ -7,5 +7,6 @@ defmodule StreamerWeb.CaptchaController do
   end
 
   def get_ticket(conn, %{"solution" => solution}) do
+    json(conn, %{status: Streamer.Pow.verify_solution(solution)})
   end
 end
