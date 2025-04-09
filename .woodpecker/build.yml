@@ -1,0 +1,19 @@
+when:
+  - event: push
+    branch: release
+
+steps:
+  - name: build
+    image: woodpeckerci/plugin-kaniko
+    settings:
+      registry: registry.internal.skyeto.net
+      repo: blog-api
+      auto_tag: true
+      cache: true
+      build_args:
+        - COMMIT_SHA=${CI_COMMIT_SHA}
+        - COMMIT_AUTHOR_EMAIL=${CI_COMMIT_AUTHOR_EMAIL}
+      username:
+        from_secret: registry_username
+      password:
+        from_secret: registry_password
