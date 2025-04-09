@@ -1,6 +1,6 @@
 FROM hexpm/elixir:1.17.2-erlang-27.0.1-debian-bullseye-20240904-slim AS builder
 
-RUN apt-get update -y && apt-get install -y build-essential git \
+RUN apt-get update -y && apt-get install -y build-essential git openssl libssl-dev pkg-config \
     && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 WORKDIR /app
