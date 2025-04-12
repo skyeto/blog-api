@@ -2,8 +2,6 @@ defmodule Streamer.Release do
   @app :streamer
 
   def migrate() do
-    load_app()
-
     for repo <- repos() do
       {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
     end
@@ -11,9 +9,5 @@ defmodule Streamer.Release do
 
   defp repos() do
     Application.fetch_env!(@app, :ecto_repos)
-  end
-
-  defp load_app() do
-    Application.load(@app)
   end
 end
