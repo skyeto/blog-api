@@ -3,10 +3,10 @@ import Config
 config :streamer, ecto_repos: [Streamer.Repo]
 
 config :streamer, Streamer.Repo,
-  database: "streamer",
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost"
+  database: System.get_env("STREAMER_DB_NAME") || "streamer",
+  username: System.get_env("STREAMER_DB_USERNAME") || "postgres",
+  password: System.get_env("STREAMER_DB_PASSWORD") || "postgres",
+  hostname: System.get_env("STREAMER_DB_HOST") || "localhost"
 
 config :ex_aws,
   access_key_id: System.get_env("STREAMER_S3_ACCESS_KEY"),
@@ -18,7 +18,7 @@ config :ex_aws, :s3,
 
 config :streamer, StreamerWeb.Endpoint,
   adapter: Bandit.PhoenixAdapter,
-  url: [host: "api.blog.skyeto.net", port: 443],
+  url: [host: "blog-api.skyeto.net", port: 443],
   secret_key_base: System.get_env("STREAMER_SECRET_KEY_BASE"),
   http: [port: 3000],
   debug_errors: true,
