@@ -40,7 +40,7 @@ defmodule Streamer.MixProject do
       # AV
       {:membrane_core, "~> 1.1"},
       {:membrane_opus_plugin, "~> 0.20.4"},
-      {:membrane_webrtc_plugin, "~> 0.23.0"},
+      # {:membrane_webrtc_plugin, "~> 0.23.0"},
       {:membrane_portaudio_plugin, "~> 0.19.2"},
       {:membrane_rtmp_plugin, "~> 0.27.3"},
       {:membrane_matroska_plugin, "~> 0.6.0"},
