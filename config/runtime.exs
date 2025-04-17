@@ -18,13 +18,17 @@ config :ex_aws, :s3,
 
 config :streamer, StreamerWeb.Endpoint,
   adapter: Bandit.PhoenixAdapter,
-  url: [host: "blog-api.skyeto.net", port: 443],
+  url: [host: "blog-api.skyeto.net", port: 3000],
   secret_key_base: System.get_env("STREAMER_SECRET_KEY_BASE"),
   http: [port: 3000],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
   pubsub_server: Streamer.PubSub
+
+if System.get_env("PHX_SERVER") do
+  config :streamer, StreamerWeb.Endpoint, server: true
+end
 
 config :streamer, Streamer.Guardian.Session,
   issues: "streamer",

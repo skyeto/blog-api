@@ -46,4 +46,4 @@ COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/streamer ./
 
 USER nobody
 
-CMD ["sh", "-c", "/app/bin/streamer eval \"Streamer.Release.migrate\" && /app/bin/streamer start --no-halt"]
+CMD ["sh", "-c", "/app/bin/streamer eval \"Streamer.Release.migrate\" && /app/bin/server"]

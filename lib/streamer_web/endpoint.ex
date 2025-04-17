@@ -8,7 +8,10 @@ defmodule StreamerWeb.Endpoint do
 
   plug(Corsica,
     origins: [
-      "http://localhost:4321"
+      "http://localhost:4321",
+      "https://skyeto.com",
+      "https://staging.blog.skyeto.net",
+      "https://api.blog.skyeto.net"
     ],
     allow_methods: :all,
     allow_headers: :all
