@@ -9,7 +9,8 @@ defmodule Streamer.Application do
       {Streamer.Pipeline, name: Streamer.Pipeline},
       {Phoenix.PubSub, name: Streamer.PubSub},
       {Cachex, [:pow_cache, [expiration: Cachex.Spec.expiration(interval: :timer.minutes(3))]]},
-      {Streamer.RateLimit, [clean_period: :timer.minutes(1)]}
+      {Streamer.RateLimit, [clean_period: :timer.minutes(10)]},
+      {Task.Supervisor, name: Streamer.TaskSupervisor}
     ]
 
     opts = [strategy: :one_for_one, name: Streamer.Supervisor]

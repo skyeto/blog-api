@@ -132,7 +132,7 @@ defmodule Streamer.HLSStorage do
   end
 
   defp keyTag(iv) do
-    "#EXT-X-KEY:METHOD=AES-128,URI=http://localhost:4000/api/license,IV=0x#{:binary.decode_unsigned(iv) |> Integer.to_string(16)}"
+    "#EXT-X-KEY:METHOD=AES-128,URI=http://localhost:3000/api/license,IV=0x#{:binary.decode_unsigned(iv) |> Integer.to_string(16)}"
   end
 
   defp pad_pkcs(data, size) do

@@ -1,6 +1,9 @@
 import Config
 
-config :streamer, ecto_repos: [Streamer.Repo]
+config :streamer,
+  ecto_repos: [Streamer.Repo],
+  privpass_api: System.get_env("STREAMER_PRIVPASS_API", "http://localhost:3000"),
+  ollama_api: System.get_env("STREAMER_OLLAMA_API", "http://localhost:11434/api")
 
 config :streamer, Streamer.Repo,
   database: System.get_env("STREAMER_DB_NAME") || "streamer",

@@ -22,18 +22,49 @@ defmodule StreamerWeb.ChatChannel do
     msg = HtmlSanitizeEx.strip_tags(msg)
     nick = HtmlSanitizeEx.strip_tags(nick)
 
+    ollama = Ollama.init(Application.get_env(:streamer, :ollama_api))
+
+    {rate_limit_resp, window} =
+      Streamer.RateLimit.hit(
+        "chat_send:#{socket.assigns.guardian_default_claims["sub"]}",
+        :timer.minutes(1),
+        5
+      )
+
     cond do
+      rate_limit_resp == :deny ->
+        {:reply, {:error, %{reason: "rate_limit", details: Integer.to_string(div(window, 1000))}},
+         socket}
+
+      String.equivalent?(nick, "system") ->
+        {:reply, {:error, %{reason: "bad_nick", details: "nick cannot be system"}}, socket}
+
       String.length(nick) > 20 ->
-        {:reply, {:error, %{reason: "nick too long"}}, socket}
+        {:reply, {:error, %{reason: "nick_too_long", details: "nick too long"}}, socket}
 
       String.length(msg) > 100 ->
-        {:reply, {:error, %{reason: "message too long"}}, socket}
+        {:reply, {:error, %{reason: "long_message", details: "message too long"}}, socket}
 
       true ->
-        ChatMessage.insert(nick, msg)
+        # TODO: Probably best to always broadcast, but then clear it if the content ends up bad...
         Phoenix.Channel.broadcast(socket, "message", %{nick: nick, content: msg})
 
-        {:reply, :ok, socket}
+        {:ok, %{"response" => check_resp}} =
+          Ollama.completion(ollama, model: "llama-guard3:1b", prompt: msg)
+
+        if String.contains?(check_resp, "unsafe") do
+          type =
+            case String.split(check_resp, "\n") |> Enum.at(1) do
+              "S12" -> "woah thirsty are we"
+              "S10" -> "hate speech!? this incident will be reported"
+              t -> "generic"
+            end
+
+          {:reply, {:error, %{reason: "unsafe_message", details: type}}, socket}
+        else
+          ChatMessage.insert(nick, msg)
+          {:reply, :ok, socket}
+        end
     end
   end
 

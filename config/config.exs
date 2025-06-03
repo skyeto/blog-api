@@ -1,6 +1,7 @@
 import Config
 
 config :streamer, ecto_repos: [Streamer.Repo]
+config :membrane_core, :logger, verbose: false
 
 config :streamer, Streamer.Repo,
   database: "streamer",

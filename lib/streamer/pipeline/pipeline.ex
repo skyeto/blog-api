@@ -62,7 +62,11 @@ defmodule Streamer.Pipeline do
             sample_format: :s16le
           }
         })
-        |> child(Membrane.AAC.FDK.Encoder)
+        # |> child(Membrane.AAC.FDK.Encoder)
+        # |> child(%Membrane.Debug.Filter{
+        #  handle_buffer: &IO.inspect(&1, label: "buffer"),
+        #  handle_stream_format: &IO.inspect(&1, label: "stream format")
+        # })
         |> get_child(:hls_audio_funnel),
         get_child(:rtmp_source)
         |> via_out(:video)

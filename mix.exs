@@ -51,6 +51,8 @@ defmodule Streamer.MixProject do
       {:membrane_audio_mix_plugin, "~> 0.16.2"},
       {:membrane_ffmpeg_swresample_plugin, "~> 0.20.2"},
       {:membrane_mp4_plugin, "~> 0.35.2"},
+      {:membrane_generator_plugin, "~> 0.10.0"},
+      {:membrane_file_plugin, "~> 0.17.2"},
 
       # DB
       {:ecto, "~> 3.12"},
@@ -62,6 +64,7 @@ defmodule Streamer.MixProject do
       {:cachex, "~> 4.0"},
 
       # Extra
+      {:ollama, "~> 0.7.1"},
       {:sweet_xml, "~> 0.6"},
       {:blake2_elixir, "~> 0.8.1"},
       {:murmur, "~> 2.0"},

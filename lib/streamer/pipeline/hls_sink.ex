@@ -26,11 +26,35 @@ defmodule Streamer.Pipeline.HLSSink do
             mode: :live,
             hls_mode: :separate_av
           }),
-          child(:hls_audio_funnel, Membrane.Funnel)
+          # child(:hls_audio_funnel, Membrane.Funnel)
+          child(:hls_audio_funnel, %Membrane.LiveAudioMixer{
+            stream_format: %Membrane.RawAudio{
+              channels: 2,
+              sample_rate: 48_000,
+              sample_format: :s16le
+            }
+          })
+          |> child(%Membrane.AAC.FDK.Encoder{
+            bitrate: 196_000
+          })
+          # |> via_in(:input, toilet_capacity: 500)
+          # |> child(:aac_parser, %Membrane.AAC.Parser{out_encapsulation: :none})
           |> via_in(Pad.ref(:input, "audio_master"),
-            options: [encoding: :AAC, segment_duration: Membrane.Time.seconds(2)]
+            options: [
+              encoding: :AAC,
+              segment_duration: Membrane.Time.seconds(2)
+            ]
           )
-          |> get_child(:hls_sink_bin)
+          |> get_child(:hls_sink_bin),
+          child(:empty_audio_generator, %Membrane.SilenceGenerator{
+            stream_format: %Membrane.RawAudio{
+              channels: 2,
+              sample_rate: 48_000,
+              sample_format: :s16le
+            },
+            duration: :infinity
+          })
+          |> get_child(:hls_audio_funnel)
           # child(:hls_video_funnel, Membrane.Funnel)
           # |> via_in(Pad.ref(:input, "video_master"),
           #   options: [encoding: :H264, segment_duration: Membrane.Time.seconds(2)]

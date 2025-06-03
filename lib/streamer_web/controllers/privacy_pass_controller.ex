@@ -3,7 +3,7 @@ defmodule StreamerWeb.PrivacyPassController do
 
   def token_challenge(conn, _params) do
     ppChallenge =
-      Tesla.get!("http://localhost:3000/token-challenge").body
+      Tesla.get!("#{Application.get_env(:streamer, :privpass_api)}/token-challenge").body
 
     {:ok, powChallenge} = Streamer.Pow.generate()
 
@@ -24,7 +24,7 @@ defmodule StreamerWeb.PrivacyPassController do
       :ok ->
         tokens =
           Tesla.post!(
-            "http://localhost:3000/token-request",
+            "#{Application.get_env(:streamer, :privpass_api)}/token-request",
             Jason.encode!(%{tokenRequest: tokenRequest}),
             opts: [adapter: [recv_timeout: 5_000]]
           ).body
@@ -38,12 +38,22 @@ defmodule StreamerWeb.PrivacyPassController do
 
   def token_exchange(conn, %{"token" => token}) do
     isValid =
-      Tesla.post!("http://localhost:3000/token-validate", Jason.encode!(%{token: token})).body
+      Tesla.post!(
+        "#{Application.get_env(:streamer, :privpass_api)}/token-validate",
+        Jason.encode!(%{token: token})
+      ).body
 
     case isValid do
       "valid" ->
         {:ok, sessionToken, _} =
-          Streamer.Guardian.Session.encode_and_sign(%{id: "anyonymous"}, %{}, ttl: {24, :hours})
+          Streamer.Guardian.Session.encode_and_sign(
+            %{
+              id:
+                "anon_#{:crypto.strong_rand_bytes(10) |> Base.url_encode64() |> binary_part(0, 10)}"
+            },
+            %{},
+            ttl: {24, :hours}
+          )
 
         json(conn, %{valid: isValid, session_token: sessionToken})
 
@@ -56,6 +66,6 @@ defmodule StreamerWeb.PrivacyPassController do
   end
 
   defp issueToken(tokenChallenge) do
-    Tesla.post!("http://localhost:3000/token-request", tokenChallenge).body
+    Tesla.post!("#{Application.get_env(:streamer, :privpass_api)}/token-request", tokenChallenge).body
   end
 end
