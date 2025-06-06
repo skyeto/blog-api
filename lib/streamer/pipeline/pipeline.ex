@@ -157,7 +157,7 @@ defmodule Streamer.Pipeline do
       port: 1935,
       use_ssl?: false,
       handle_new_client: fn client_ref, app, stream_key ->
-        if stream_key == "abc123" do
+        if stream_key == System.get_env!("STREAMER_STREAM_KEY") do
           send(pipeline_pid, {:new_rtmp_client, client_ref})
           Membrane.RTMP.Source.ClientHandlerImpl
         else
